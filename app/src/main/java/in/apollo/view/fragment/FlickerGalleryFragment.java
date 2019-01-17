@@ -1,42 +1,66 @@
 package in.apollo.view.fragment;
 
+import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestFutureTarget;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import in.apollo.R;
+import in.apollo.model.pojo.FlickerItemPojo;
 import in.apollo.model.pojo.FlickerPojo;
 import in.apollo.utils.GridSpacingItemDecoration;
 import in.apollo.utils.OnClickListener;
 import in.apollo.utils.SortByDateComparator;
+import in.apollo.utils.Utils;
+import in.apollo.view.activity.MainActivity;
 import in.apollo.view.adapter.FlickrImgAdapter;
+import in.apollo.view.main.ApolloApplication;
 import in.apollo.viewmodel.gallery.GalleryViewModel;
 
+import static in.apollo.utils.Constant.REQUEST_CODE_WRITE_STORAGE_PERMISSION;
+
+/**
+ * Fragment class to show flickr images in grid
+ */
 public class FlickerGalleryFragment extends Fragment implements OnClickListener {
     @BindView(R.id.search)
     SearchView searchView;
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
 
     private FlickrImgAdapter flickrImgAdapter;
     private GalleryViewModel galleryViewModel;
+    private FlickerItemPojo flickerItemPojo;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -87,14 +111,20 @@ public class FlickerGalleryFragment extends Fragment implements OnClickListener 
     }
 
     private void observeViewModel(GalleryViewModel viewModel) {
+        visibleProgress(View.VISIBLE);
         viewModel.getFlickrImageObservable().observe(this, new Observer<FlickerPojo>() {
             @Override
             public void onChanged(@Nullable FlickerPojo projects) {
+                visibleProgress(View.GONE);
                 if (projects != null) {
                     setAdapter(projects);
                 }
             }
         });
+    }
+
+    private void visibleProgress(int visible) {
+        progressBar.setVisibility(visible);
     }
 
     private void setAdapter(FlickerPojo projects) {
@@ -105,13 +135,14 @@ public class FlickerGalleryFragment extends Fragment implements OnClickListener 
     }
 
     @Override
-    public void longPress(String url, String title) {
+    public void longPress(FlickerItemPojo flickerItemPojo) {
+        this.flickerItemPojo = flickerItemPojo;
         final CharSequence[] items = {
                 "Save", "Share"
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Make your selection");
+        builder.setTitle(R.string.app_name);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 switch (item){
@@ -119,7 +150,7 @@ public class FlickerGalleryFragment extends Fragment implements OnClickListener 
                         save();
                         break;
                     case 1:
-                        shareTextUrl(url, title);
+                        shareTextUrl(flickerItemPojo.getMedia().getM(), flickerItemPojo.getTitle());
                         break;
                 }
             }
@@ -135,7 +166,7 @@ public class FlickerGalleryFragment extends Fragment implements OnClickListener 
     }
 
     private void save() {
-
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_STORAGE_PERMISSION);
     }
 
     private void shareTextUrl(String url, String title) {
@@ -149,5 +180,32 @@ public class FlickerGalleryFragment extends Fragment implements OnClickListener 
         share.putExtra(Intent.EXTRA_TEXT, url);
 
         startActivity(Intent.createChooser(share, "Share"));
+    }
+
+    public void permissionActionDone(boolean isPermissionAccepted) {
+        if (isPermissionAccepted) {
+            String fileUrl = flickerItemPojo.getMedia().getM();
+            if (!TextUtils.isEmpty(fileUrl) && fileUrl.contains("/")) {
+                int fileNameStartIndex = fileUrl.lastIndexOf("/") + 1;
+                if (fileUrl.length() >= fileNameStartIndex) {
+                    String fileName = fileUrl.substring(fileNameStartIndex);
+                    Glide.with(ApolloApplication.getContext())
+                            .asBitmap()
+                            .load(flickerItemPojo.getMedia().getM())
+                            .into(new SimpleTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                                    Utils.saveImageToStorage(resource, fileName);
+                                    Utils.addImageToGallery(fileName, ApolloApplication.getContext());
+                                }
+
+                                @Override
+                                public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                    super.onLoadFailed(errorDrawable);
+                                }
+                            });
+                }
+            }
+        }
     }
 }

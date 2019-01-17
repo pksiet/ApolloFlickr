@@ -23,6 +23,9 @@ import in.apollo.model.pojo.FlickerItemPojo;
 import in.apollo.utils.OnClickListener;
 import in.apollo.view.main.ApolloApplication;
 
+/**
+ * Adapter to populate flickr images
+ */
 public class FlickrImgAdapter extends RecyclerView.Adapter<FlickrImgAdapter.FlickrItemViewHolder> implements Filterable {
     private List<FlickerItemPojo> flickerItemList;
     private List<FlickerItemPojo> flickerItemFilterList;
@@ -66,7 +69,7 @@ public class FlickrImgAdapter extends RecyclerView.Adapter<FlickrImgAdapter.Flic
             @Override
             public boolean onLongClick(View v) {
                 if(onLongPressListener != null){
-                    onLongPressListener.longPress(flickerItemFilterList.get(position).getMedia().getM(), flickerItemFilterList.get(position).getTitle());
+                    onLongPressListener.longPress(flickerItemFilterList.get(position));
                 }
                 return true;
             }
@@ -86,6 +89,10 @@ public class FlickrImgAdapter extends RecyclerView.Adapter<FlickrImgAdapter.Flic
         return flickrItemFilter;
     }
 
+    /**
+     * register listener to take click and long press callback
+     * @param onLongPressListener type of OnClickListener
+     */
     public void registerLongPress(OnClickListener onLongPressListener) {
         this.onLongPressListener = onLongPressListener;
     }
@@ -121,6 +128,9 @@ public class FlickrImgAdapter extends RecyclerView.Adapter<FlickrImgAdapter.Flic
 
     }
 
+    /**
+     * ViewHolder to cache view objects
+     */
     public class FlickrItemViewHolder extends RecyclerView.ViewHolder {
         public TextView titleTV;
         public ImageView flickerImageIV;
