@@ -13,6 +13,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * This is ViewModel class. Used to talk between Flicker ui and model classes to take
+ * images from server
+ */
 public class GalleryViewModel extends AndroidViewModel {
     private MutableLiveData<FlickerPojo> flickrImg = new MutableLiveData<>();
 
@@ -20,6 +24,10 @@ public class GalleryViewModel extends AndroidViewModel {
         super(application);
     }
 
+    /**
+     * Returns Flickr images in FlickerPojo object from Flickr feeds
+     * @return type of LiveData<FlickerPojo>
+     */
     public LiveData<FlickerPojo> getFlickrImageObservable() {
         RetrofitClient.instance().getFlickrFeeds("json", "1").enqueue(new Callback<FlickerPojo>() {
             @Override
