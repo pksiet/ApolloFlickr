@@ -1,4 +1,4 @@
-package com.example.apolloflickr;
+package in.apollo;
 
 import org.junit.Test;
 

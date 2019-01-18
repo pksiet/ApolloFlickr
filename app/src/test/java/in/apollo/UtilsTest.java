@@ -26,5 +26,6 @@ public class UtilsTest {
         String date = null;
         long time = Utils.getLongFromDate(date);
         Assert.assertTrue(time == 0);
+
     }
 }
