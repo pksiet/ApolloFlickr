@@ -51,6 +51,7 @@ public class FlickrImgAdapter extends RecyclerView.Adapter<FlickrImgAdapter.Flic
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.mipmap.ic_launcher);
         requestOptions.error(R.mipmap.ic_launcher);
+
         Glide.with(ApolloApplication.getContext())
                 .setDefaultRequestOptions(requestOptions)
                 .load(flickerItemFilterList.get(position).getMedia().getM()).into(myViewHolder.flickerImageIV);

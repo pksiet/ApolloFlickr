@@ -30,6 +30,12 @@ public class Utils {
         return time;
     }
 
+    /**
+     * Used for saving image into storage
+     * @param bitmap
+     * @param fileName
+     */
+
     public static void saveImageToStorage(Bitmap bitmap, String fileName) {
         if(!TextUtils.isEmpty(fileName) && bitmap != null) {
             String root = Environment.getExternalStorageDirectory().toString();
@@ -48,6 +54,11 @@ public class Utils {
         }
     }
 
+    /**
+     * Call it to show image in phone gallery
+     * @param fileName
+     * @param context
+     */
     public static void addImageToGallery(final String fileName, final Context context) {
         String root = Environment.getExternalStorageDirectory().toString();
         ContentValues values = new ContentValues();

@@ -165,10 +165,18 @@ public class FlickerGalleryFragment extends Fragment implements OnClickListener 
         startActivity(browserIntent);
     }
 
+    /**
+     * External storage write permission
+     */
     private void save() {
         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_STORAGE_PERMISSION);
     }
 
+    /**
+     * Implicit share image file
+     * @param url
+     * @param title
+     */
     private void shareTextUrl(String url, String title) {
         Intent share = new Intent(android.content.Intent.ACTION_SEND);
         share.setType("text/plain");
