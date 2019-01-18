@@ -16,17 +16,20 @@ import java.util.Random;
 import static in.apollo.utils.Constant.FLICKR_IMAGE_DIR_NAME;
 
 public class Utils {
-    public static final String DATE_FORMAT_TAKEN_ON = "yyyy-MM-dd'T'HH:mm:ssZ";//2019-01-16T19:11:23-08:00
+    public static final String DATE_FORMAT_TAKEN_ON = "yyyy-MM-dd'T'HH:mm:ss-ss:ss";//2019-01-16T19:11:23-08:00
 
     public static long getLongFromDate(String date){
         long time = 0;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_TAKEN_ON);
-        try {
-            time = simpleDateFormat.parse(date).getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if(date!=null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_TAKEN_ON);
+            try {
+                time = simpleDateFormat.parse(date).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
-
         return time;
     }
 
