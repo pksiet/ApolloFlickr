@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/iv_flickr"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="@dimen/image_width"
+        android:layout_height="@dimen/image_height"
         android:scaleType="centerCrop"/>
 
     <TextView
